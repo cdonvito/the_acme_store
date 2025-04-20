@@ -8,9 +8,9 @@ const client = new pg.Client(
 
 const createTables = async () => {
   const SQL = `
-        DROP TABLE IF EXISTS user_skills;
+        DROP TABLE IF EXISTS favorites;
         DROP TABLE IF EXISTS users;
-        DROP TABLE IF EXISTS skills;
+        DROP TABLE IF EXISTS products;
 
         CREATE TABLE products(
             id UUID PRIMARY KEY, 
@@ -19,14 +19,14 @@ const createTables = async () => {
 
         CREATE TABLE users(
             id UUID PRIMARY KEY,
-            username VARCHAR(255) NOT NULL, 
+            username VARCHAR(255) NOT NULL UNIQUE, 
             password VARCHAR(255) NOT NULL
         );
 
         CREATE TABLE favorites(
             id UUID PRIMARY KEY,
-            product_id UUID REFERENCES users(id) NOT NULL,
-            user_id UUID REFERENCES skills(id) NOT NULL,
+            product_id UUID REFERENCES products(id) NOT NULL,
+            user_id UUID REFERENCES users(id) NOT NULL,
             CONSTRAINT unique_user_favorite UNIQUE (user_id, product_id)
         );
     `;
@@ -67,8 +67,8 @@ const fetchProducts = async () => {
   return response.rows;
 };
 
-const createFavorite = async (product_id ,user_id) => {
-  const SQL = `INSERT INTO favorites(id, producdt_id, user_id) VALUES($1, $2, $3) RETURNING *;`;
+const createFavorite = async (product_id, user_id) => {
+  const SQL = `INSERT INTO favorites(id, product_id, user_id) VALUES($1, $2, $3) RETURNING *;`;
 
   const reponse = await client.query(SQL, [uuid.v4(), product_id, user_id]);
 

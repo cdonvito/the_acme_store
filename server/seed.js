@@ -16,13 +16,14 @@ const seed = async () => {
   await createTables();
   console.log("tables created");
 
-  const [craig, madie, scooby, zebraCake, dotPretz, pumpkin] = await Promise.all([
+  const [craig, madie, scooby, zebraCake, dotPretz, pumpkin, chicken] = await Promise.all([
     createUser("Craig", "password123"),
     createUser("Madie", "anotherpassword"),
     createUser("Scooby", "testpassword"),
     createProduct("Zebra Cakes"),
     createProduct("Dot's Pretzels"),
     createProduct("Pumpkin"),
+    createProduct("Chicken"),
   ]);
 
   console.log("users created");
@@ -32,18 +33,22 @@ const seed = async () => {
   console.log(await fetchProducts());
 
   const [Favorite_Product] = await Promise.all([
-    createFavorite(craig.id, zebraCake.id),
-    createFavorite(madie.id, dotPretz.id),
-    createFavorite(scooby.id, pumpkin.id),
+    createFavorite(zebraCake.id, craig.id),
+    createFavorite(dotPretz.id, madie.id),
+    createFavorite(pumpkin.id, scooby.id),
+  ]);
+
+  const [Favorite_Product1] = await Promise.all([
+    createFavorite(chicken.id, craig.id)
   ]);
 
   console.log("favorites created");
   console.log(await fetchFavorites(craig.id));
 
-  await destroyFavorite(Favorite_Product.id, madie.id);
+  await destroyFavorite(Favorite_Product1.id, craig.id);
 
   console.log("after deleting favorite");
-  console.log(await fetchFavorites(madie.id));
+  console.log(await fetchFavorites(craig.id));
 
   await client.end();
 };
